@@ -1,0 +1,161 @@
+import type {
+  JournalEntry,
+  MarketSnapshot,
+  PaperPosition,
+  PortfolioState,
+  TradeIntent,
+} from "./types";
+
+const now = "2026-05-31T09:00:00.000Z";
+
+export const fallbackMarkets: MarketSnapshot[] = [
+  {
+    id: "bitcoin",
+    symbol: "BTC",
+    name: "Bitcoin",
+    price: 67420,
+    change24h: 1.9,
+    marketCap: 1328000000000,
+    volume24h: 29100000000,
+    signal: "wait",
+    risk: "medium",
+    updatedAt: now,
+  },
+  {
+    id: "ethereum",
+    symbol: "ETH",
+    name: "Ethereum",
+    price: 3625,
+    change24h: 2.7,
+    marketCap: 435000000000,
+    volume24h: 15100000000,
+    signal: "accumulate",
+    risk: "medium",
+    updatedAt: now,
+  },
+  {
+    id: "solana",
+    symbol: "SOL",
+    name: "Solana",
+    price: 154.2,
+    change24h: -0.8,
+    marketCap: 71100000000,
+    volume24h: 2900000000,
+    signal: "wait",
+    risk: "high",
+    updatedAt: now,
+  },
+  {
+    id: "chainlink",
+    symbol: "LINK",
+    name: "Chainlink",
+    price: 18.4,
+    change24h: 0.6,
+    marketCap: 10900000000,
+    volume24h: 620000000,
+    signal: "accumulate",
+    risk: "medium",
+    updatedAt: now,
+  },
+];
+
+export const seedPortfolio: PortfolioState = {
+  equityUsd: 10000,
+  cashUsd: 8640,
+  dailyRealizedPnlUsd: 84,
+  dailyDrawdownPct: 0.7,
+};
+
+export const seedTradeIdeas: TradeIntent[] = [
+  {
+    id: "idea-btc-range-long",
+    symbol: "BTCUSDT",
+    side: "long",
+    product: "spot",
+    quantity: 0.018,
+    entryPrice: 67420,
+    stopLoss: 65100,
+    takeProfit: 71200,
+    leverage: 1,
+    confidence: 0.68,
+    thesis: "Range reclaim with improving volume, but size stays small until volatility compresses.",
+  },
+  {
+    id: "idea-eth-breakout-long",
+    symbol: "ETHUSDT",
+    side: "long",
+    product: "spot",
+    quantity: 0.31,
+    entryPrice: 3625,
+    stopLoss: 3478,
+    takeProfit: 3890,
+    leverage: 1,
+    confidence: 0.71,
+    thesis: "Momentum and relative strength are improving; Risk Manager requires a hard stop.",
+  },
+  {
+    id: "idea-sol-hedge-short",
+    symbol: "SOLUSDT",
+    side: "short",
+    product: "derivatives",
+    quantity: 8,
+    entryPrice: 154.2,
+    stopLoss: 161.6,
+    takeProfit: 142.8,
+    leverage: 2,
+    confidence: 0.64,
+    thesis: "Short hedge only, sized as a paper-trading scenario while live derivatives remain disabled.",
+  },
+];
+
+export const seedPaperPositions: PaperPosition[] = [
+  {
+    id: "paper-eth-001",
+    symbol: "ETHUSDT",
+    side: "long",
+    product: "spot",
+    quantity: 0.25,
+    entryPrice: 3502,
+    markPrice: 3625,
+    openedAt: "2026-05-30T14:10:00.000Z",
+    unrealizedPnlUsd: 30.75,
+  },
+  {
+    id: "paper-sol-002",
+    symbol: "SOLUSDT",
+    side: "short",
+    product: "derivatives",
+    quantity: 5,
+    entryPrice: 158.6,
+    markPrice: 154.2,
+    openedAt: "2026-05-30T18:35:00.000Z",
+    unrealizedPnlUsd: 22,
+  },
+];
+
+export const seedJournalEntries: JournalEntry[] = [
+  {
+    id: "audit-001",
+    timestamp: "2026-05-31T08:42:00.000Z",
+    actor: "system",
+    event: "startup",
+    summary: "AlphaDesk booted with paper trading enabled and live trading disabled.",
+    metadata: { paperTrading: true, liveTrading: false },
+  },
+  {
+    id: "audit-002",
+    timestamp: "2026-05-31T08:47:00.000Z",
+    actor: "risk-manager",
+    event: "trade-veto",
+    summary: "Risk Manager vetoed a derivatives idea because product live trading is disabled.",
+    metadata: { product: "derivatives", liveProductFlag: false },
+  },
+  {
+    id: "audit-003",
+    timestamp: "2026-05-31T08:55:00.000Z",
+    actor: "agent",
+    event: "reasoning",
+    summary: "Agent reasoning completed with deterministic fallback because no OpenAI key was required for build.",
+    metadata: { fallback: true },
+  },
+];
