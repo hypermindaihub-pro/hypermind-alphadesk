@@ -2,6 +2,27 @@ import { expect, test, type Page } from "@playwright/test";
 
 const accessCode = process.env.ALPHADESK_ACCESS_CODE ?? "alphadesk-browser-access";
 const adminCode = process.env.ALPHADESK_ADMIN_CODE ?? "alphadesk-browser-admin";
+const browserErrors = new WeakMap<Page, string[]>();
+
+test.beforeEach(async ({ page }) => {
+  const errors: string[] = [];
+  browserErrors.set(page, errors);
+  page.on("console", (message) => {
+    const expectedGuardRejection =
+      message.text() ===
+      "Failed to load resource: the server responded with a status of 403 (Forbidden)";
+    if (message.type() === "error" && !expectedGuardRejection) {
+      errors.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => {
+    errors.push(error.message);
+  });
+});
+
+test.afterEach(async ({ page }) => {
+  expect(browserErrors.get(page) ?? []).toEqual([]);
+});
 
 async function login(page: Page, code = accessCode, next = "/dashboard") {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
@@ -42,7 +63,7 @@ test.describe("AlphaDesk browser workflows", () => {
     await page.getByRole("link", { name: "Agents" }).click();
     await expect(page).toHaveURL(/\/agents$/);
     await expect(page.getByText("Agent reasoning workstation")).toBeVisible();
-    await page.getByRole("link", { name: /Paper Trading/ }).click();
+    await page.getByRole("link", { name: "Execution", exact: true }).click();
     await expect(page).toHaveURL(/\/paper-trading$/);
     await expect(page.getByText("Paper execution workstation")).toBeVisible();
   });
@@ -51,13 +72,13 @@ test.describe("AlphaDesk browser workflows", () => {
     await login(page, accessCode, "/agents");
 
     const startedAt = Date.now();
-    await page.getByRole("button", { name: "Run agent reasoning" }).click();
-    await expect(page.getByText("Specialist workbench")).toBeVisible();
-    await expect(page.getByText("Market analyst")).toBeVisible();
-    await expect(page.getByText("Risk manager agent")).toBeVisible();
-    await expect(page.getByText("Execution coach", { exact: true })).toBeVisible();
-    await expect(page.getByText("Journal coach", { exact: true })).toBeVisible();
-    await expect(page.getByText("4 agents")).toBeVisible();
+    await page.getByRole("button", { name: "Run all agents" }).click();
+    await expect(page.getByText("Agent command center")).toBeVisible();
+    await expect(page.getByText("Research Agent")).toBeVisible();
+    await expect(page.getByText("Risk Agent")).toBeVisible();
+    await expect(page.getByText("Execution Agent")).toBeVisible();
+    await expect(page.getByText("Sentiment Agent")).toBeVisible();
+    await expect(page.getByText("Portfolio Agent")).toBeVisible();
     await expect(page.getByText("deterministic-fallback")).toBeVisible();
 
     const durationMs = Date.now() - startedAt;
@@ -71,7 +92,7 @@ test.describe("AlphaDesk browser workflows", () => {
 
     await expect(page.getByText("Operator execution choice")).toBeVisible();
     await expect(page.getByText("Paper selected")).toBeVisible();
-    await page.getByRole("button", { name: "Sync selected idea" }).click();
+    await page.getByRole("button", { name: "Sync selected idea" }).last().click();
     await expect(page.getByText("ticket valid")).toBeVisible();
     await page.getByRole("button", { name: "Submit paper ticket" }).click();
     await expect(page.getByText(/Opened paper ticket ETHUSDT/).first()).toBeVisible();

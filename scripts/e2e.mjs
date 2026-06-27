@@ -27,7 +27,7 @@ const requiredRoutes = [
 ];
 const requiredUiAffordances = [
   ["/login", ['name="access_code"', 'action="/api/auth/login"', "Enter private desk"]],
-  ["/dashboard", ["Record snapshot", "Submit live request", "Run agent"]],
+  ["/dashboard", ["Record snapshot", "Live Trade", "Review &amp; approve paper order", "Run agent"]],
   ["/paper-trading", ["Paper order ticket", "Sync selected idea", "Submit paper ticket"]],
   ["/reports", ["Diagnostics and readiness history", "Run reconciliation"]],
   ["/settings", ["Record diagnostics", "Enable autosave", "Create vault", "Import vault"]],
