@@ -149,3 +149,74 @@ export function EmptyState({
     </div>
   );
 }
+
+// A placeholder block that holds layout dimensions while async content loads.
+// Honors prefers-reduced-motion via the `.ad-skeleton` rule in globals.css.
+export function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={`ad-skeleton rounded bg-white/[0.05] ${className}`}
+    />
+  );
+}
+
+// Sanitized error surface with an optional retry. Used by async panels so an
+// API failure never collapses into a false success or a blank panel.
+export function AsyncError({
+  message,
+  onRetry,
+  retryable = true,
+}: {
+  message: string;
+  onRetry?: () => void;
+  retryable?: boolean;
+}) {
+  return (
+    <div
+      className="flex flex-col gap-3 rounded-md border border-red-400/25 bg-red-400/[0.06] p-4 text-sm leading-6 text-red-100 sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+    >
+      <p className="min-w-0 break-words">{message}</p>
+      {retryable && onRetry ? (
+        <button
+          className="shrink-0 self-start rounded border border-red-400/30 bg-red-400/[0.12] px-3 py-1.5 text-[11px] font-semibold text-red-100 transition hover:bg-red-400/20 sm:self-auto"
+          onClick={onRetry}
+          type="button"
+        >
+          Try again
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+// Polite live region for async status text so screen readers announce
+// loading / success / error transitions that are otherwise colour-only.
+export function LiveStatus({
+  children,
+  tone = "neutral",
+  className = "",
+}: {
+  children: ReactNode;
+  tone?: Tone;
+  className?: string;
+}) {
+  const accent = {
+    positive: "text-emerald-300",
+    warning: "text-amber-300",
+    danger: "text-red-300",
+    neutral: "text-zinc-400",
+    info: "text-sky-300",
+  }[tone];
+
+  return (
+    <p
+      aria-live="polite"
+      className={`text-sm leading-6 ${accent} ${className}`}
+      role="status"
+    >
+      {children}
+    </p>
+  );
+}

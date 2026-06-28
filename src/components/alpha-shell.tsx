@@ -94,6 +94,9 @@ export function AlphaShell({
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#080a0c] text-zinc-100">
+      <a className="ad-skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <div className="flex min-h-screen min-w-0">
         <aside className="sticky top-0 hidden h-screen w-56 shrink-0 border-r border-white/[0.07] bg-[#090c0f] lg:flex lg:flex-col">
           <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-white/[0.07] px-4">
@@ -180,7 +183,13 @@ export function AlphaShell({
             </div>
           </header>
 
-          <div className="w-full min-w-0 px-3 py-3 sm:px-4 xl:px-5 xl:py-4">{children}</div>
+          <div
+            className="w-full min-w-0 px-3 py-3 sm:px-4 xl:px-5 xl:py-4"
+            id="main-content"
+            tabIndex={-1}
+          >
+            {children}
+          </div>
         </main>
       </div>
     </div>

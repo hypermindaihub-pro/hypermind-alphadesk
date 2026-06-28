@@ -22,15 +22,19 @@ export function MarketTable({ marketData }: { marketData: MarketDataResult }) {
 
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] text-left text-xs">
+          <caption className="ad-sr-only">
+            Market scanner: {marketData.assets.length} monitored assets with{" "}
+            {marketData.status.freshness} {marketData.status.provider} data.
+          </caption>
           <thead className="bg-white/[0.015] text-[10px] uppercase text-zinc-600">
             <tr className="border-b border-white/[0.07]">
-              <th className="px-4 py-2.5 font-semibold">Asset</th>
-              <th className="px-4 py-2.5 font-semibold">Price</th>
-              <th className="px-4 py-2.5 font-semibold">24h</th>
-              <th className="px-4 py-2.5 font-semibold">Market cap</th>
-              <th className="px-4 py-2.5 font-semibold">Volume</th>
-              <th className="px-4 py-2.5 font-semibold">Signal</th>
-              <th className="px-4 py-2.5 font-semibold">Risk</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Asset</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Price</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">24h</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Market cap</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Volume</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Signal</th>
+              <th className="px-4 py-2.5 font-semibold" scope="col">Risk</th>
             </tr>
           </thead>
           <tbody>
