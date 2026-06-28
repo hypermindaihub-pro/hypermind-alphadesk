@@ -6,8 +6,6 @@
 
 import {
   Activity,
-  ArrowDownRight,
-  ArrowUpRight,
   BrainCircuit,
   ChartNoAxesCombined,
   CircleDollarSign,
@@ -31,14 +29,22 @@ import { StatusChip } from "../status-chip";
 import {
   AsyncError,
   EmptyState,
+  Gauge as RadialGauge,
   LiveStatus,
   MetricCell,
   ProgressMeter,
+  Sparkline,
   StateBadge,
   TerminalPanel,
 } from "../trading-ui";
 import { useDesk } from "./desk-context";
 import { AgentStatusCard, Button, Panel, TextInput } from "./primitives";
+import {
+  AgentWorkspaceWidgets,
+  PaperDeskWidgets,
+  RiskCenterWidgets,
+  SystemHealthWidgets,
+} from "./widgets";
 
 export function OperatorBrief() {
   const { operatorBrief } = useDesk();
@@ -1055,6 +1061,7 @@ export function AgentConsole() {
   const source = agent?.mode === "openai" ? `${config.openAiModel} / OpenAI` : "Deterministic fallback";
 
   return (
+    <div className="space-y-3">
     <TerminalPanel
       title="Agent command center"
       description="Market, Risk, and Execution lenses come from the agent workbench; Sentiment and Portfolio are deterministic local syntheses (no separate API call). All cards are advisory and cannot place orders."
@@ -1215,6 +1222,8 @@ export function AgentConsole() {
         </div>
       </div>
     </TerminalPanel>
+      <AgentWorkspaceWidgets />
+    </div>
   );
 }
 
@@ -1972,7 +1981,8 @@ export function SystemHealthView() {
   const { healthChecks } = useDesk();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
+      <SystemHealthWidgets />
       <Panel
         description="Health is operational evidence: market data freshness, keys, AI readiness, and safety defaults."
         title="System health"
@@ -2267,6 +2277,7 @@ export function DashboardView() {
     unrealizedPnl,
     realizedPnl,
     openPositions,
+    closedPositions,
     selectedIdea,
     marketData,
     riskDecision,
@@ -2281,62 +2292,144 @@ export function DashboardView() {
     runAgent,
     journal,
   } = useDesk();
-  const paperEquity = seedPortfolio.equityUsd + unrealizedPnl + realizedPnl;
-  const dailyPnl = seedPortfolio.dailyRealizedPnlUsd + unrealizedPnl + realizedPnl;
-  const exposureUsd = openPositions.reduce(
-    (sum, position) => sum + Math.abs(position.quantity * position.markPrice),
-    0,
-  );
   const selectedRiskUsd =
     Math.abs(selectedIdea.entryPrice - selectedIdea.stopLoss) * selectedIdea.quantity;
   const riskUtilization = Math.min(
     100,
     (selectedRiskUsd / Math.max(seedPortfolio.equityUsd, 1)) * 100 * 10,
   );
+  const paperEquity = seedPortfolio.equityUsd + unrealizedPnl + realizedPnl;
+  const dailyPnl = seedPortfolio.dailyRealizedPnlUsd + unrealizedPnl + realizedPnl;
+  const dailyPct = (dailyPnl / seedPortfolio.equityUsd) * 100;
+  const sessionPnl = unrealizedPnl + realizedPnl;
+  const exposureUsd = openPositions.reduce(
+    (sum, position) => sum + Math.abs(position.quantity * position.markPrice),
+    0,
+  );
+  const aiConfidence = Math.round(
+    (agentWorkbench?.runs.find((run) => run.role === "market-analyst")?.confidence ??
+      selectedIdea.confidence) * 100,
+  );
+  const positiveMarkets = marketData.assets.filter((asset) => asset.change24h >= 0).length;
+  const breadth = marketData.assets.length ? positiveMarkets / marketData.assets.length : 0.5;
+  const regime =
+    breadth >= 0.66
+      ? { label: "Risk-On", tone: "positive" as const }
+      : breadth <= 0.34
+        ? { label: "Risk-Off", tone: "danger" as const }
+        : { label: "Neutral", tone: "warning" as const };
+
+  // Cumulative paper-equity curve (real local data: baseline + realized P&L,
+  // ending at marked equity). Padded so the sparkline always has width.
+  const closedChrono = [...closedPositions].sort((a, b) =>
+    (a.closedAt ?? "").localeCompare(b.closedAt ?? ""),
+  );
+  let cum = seedPortfolio.equityUsd;
+  const equitySeries = [cum];
+  for (const p of closedChrono) {
+    cum += p.realizedPnlUsd ?? 0;
+    equitySeries.push(cum);
+  }
+  equitySeries.push(paperEquity);
+  while (equitySeries.length < 8) equitySeries.unshift(seedPortfolio.equityUsd);
 
   return (
     <div className="space-y-3">
-      <section className="grid grid-cols-2 overflow-hidden rounded-md border border-white/[0.08] xl:grid-cols-6">
-        <MetricCell
-          detail="Simulated portfolio"
-          icon={WalletCards}
-          label="Paper equity"
-          tone="positive"
-          value={formatUsd(paperEquity, 2)}
-        />
-        <MetricCell
-          detail={`${dailyPnl >= 0 ? "+" : ""}${((dailyPnl / seedPortfolio.equityUsd) * 100).toFixed(2)}%`}
-          icon={dailyPnl >= 0 ? ArrowUpRight : ArrowDownRight}
-          label="Daily P&L"
-          tone={dailyPnl >= 0 ? "positive" : "danger"}
-          value={formatUsd(dailyPnl, 2)}
-        />
-        <MetricCell
-          detail={`${openPositions.length} active paper trade${openPositions.length === 1 ? "" : "s"}`}
-          icon={ChartNoAxesCombined}
-          label="Open positions"
-          value={String(openPositions.length)}
-        />
-        <MetricCell
-          detail="Gross paper notional"
-          icon={CircleDollarSign}
-          label="Exposure"
-          value={formatUsd(exposureUsd, 0)}
-        />
-        <MetricCell
-          detail={`Selected ${selectedIdea.symbol}`}
-          icon={Gauge}
-          label="Risk score"
-          tone={riskDecision.approved ? "positive" : "danger"}
-          value={`${riskDecision.score}/100`}
-        />
-        <MetricCell
-          detail={`${marketData.status.provider} / ${marketData.status.source}`}
-          icon={Radar}
-          label="Market data"
-          tone={marketData.status.freshness === "fresh" ? "info" : "warning"}
-          value={marketData.status.freshness.toUpperCase()}
-        />
+      {/* ----------------------------- Hero --------------------------- */}
+      <section className="grid gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="ad-panel ad-scan ad-fade-up relative min-w-0 overflow-hidden p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="ad-eyebrow">Paper portfolio value</p>
+              <p className="mt-2 font-mono text-[34px] font-semibold leading-none tracking-tight tabular-nums text-zinc-50">
+                {formatUsd(paperEquity, 2)}
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs font-semibold tabular-nums ${
+                    dailyPnl >= 0
+                      ? "bg-emerald-400/10 text-emerald-300"
+                      : "bg-rose-400/10 text-rose-300"
+                  }`}
+                >
+                  {dailyPnl >= 0 ? "▲" : "▼"} {formatUsd(Math.abs(dailyPnl), 2)}
+                  <span className="opacity-70">
+                    ({dailyPct >= 0 ? "+" : ""}
+                    {dailyPct.toFixed(2)}%)
+                  </span>
+                </span>
+                <span className="text-[11px] text-zinc-500">today · paper</span>
+                <StateBadge tone={regime.tone}>{regime.label} regime</StateBadge>
+              </div>
+            </div>
+            <StateBadge tone={config.liveTradingEnabled ? "danger" : "neutral"}>
+              Live {config.liveTradingEnabled ? "review" : "locked"}
+            </StateBadge>
+          </div>
+
+          <Sparkline
+            data={equitySeries}
+            tone={sessionPnl >= 0 ? "positive" : "danger"}
+            fill
+            className="mt-4 h-24 w-full"
+          />
+
+          <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.05]">
+            {[
+              ["Exposure", formatUsd(exposureUsd, 0)],
+              ["Open positions", String(openPositions.length)],
+              ["Session P&L", formatUsd(sessionPnl, 2)],
+            ].map(([label, value]) => (
+              <div className="bg-[--ad-surface] px-3 py-2.5" key={label}>
+                <p className="ad-eyebrow">{label}</p>
+                <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-zinc-100">{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="ad-panel ad-fade-up flex min-w-0 flex-col gap-4 p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="ad-eyebrow">Risk score</p>
+              <p className="mt-1 text-xs leading-5 text-zinc-500">
+                Exact to {selectedIdea.symbol}. {riskDecision.approved ? "Approved for paper." : "Vetoed."}
+              </p>
+            </div>
+            <RadialGauge
+              value={riskDecision.score}
+              label="/ 100"
+              tone={riskDecision.approved ? "positive" : "danger"}
+              size={104}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.05]">
+            <div className="bg-[--ad-surface] px-3 py-2.5">
+              <p className="ad-eyebrow flex items-center gap-1.5">
+                <BrainCircuit className="size-3" /> AI confidence
+              </p>
+              <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-sky-300">{aiConfidence}%</p>
+            </div>
+            <div className="bg-[--ad-surface] px-3 py-2.5">
+              <p className="ad-eyebrow flex items-center gap-1.5">
+                <Radar className="size-3" /> Market feed
+              </p>
+              <p className={`mt-1 font-mono text-lg font-semibold uppercase ${marketData.status.freshness === "fresh" ? "text-emerald-300" : "text-amber-300"}`}>
+                {marketData.status.freshness}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --------------------------- Signal strip --------------------- */}
+      <section className="ad-stagger grid grid-cols-2 overflow-hidden rounded-xl border border-white/[0.06] bg-[--ad-surface] sm:grid-cols-3 xl:grid-cols-6">
+        <MetricCell icon={WalletCards} label="Weekly P&L" tone={sessionPnl >= 0 ? "positive" : "danger"} value={formatUsd(sessionPnl, 2)} detail="Paper · cumulative" spark={equitySeries} />
+        <MetricCell icon={CircleDollarSign} label="Exposure" value={formatUsd(exposureUsd, 0)} detail="Gross paper notional" />
+        <MetricCell icon={Gauge} label="Risk score" tone={riskDecision.approved ? "positive" : "danger"} value={`${riskDecision.score}/100`} detail={selectedIdea.symbol} />
+        <MetricCell icon={BrainCircuit} label="AI confidence" tone="info" value={`${aiConfidence}%`} detail={agentWorkbench ? "Workbench" : "Selected idea"} />
+        <MetricCell icon={Zap} label="Active strategies" value={String(ideas.length)} detail={`${openPositions.length} live paper`} />
+        <MetricCell icon={Activity} label="Market regime" tone={regime.tone} value={regime.label} detail={`${positiveMarkets}/${marketData.assets.length} assets up`} />
       </section>
 
       <div className="grid gap-3 2xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -2562,6 +2655,7 @@ export function RiskView() {
   return (
     <div className="space-y-3">
       <RiskOverview />
+      <RiskCenterWidgets />
       <RiskConsole />
       <LaunchReadinessPanel />
     </div>
@@ -2571,6 +2665,7 @@ export function RiskView() {
 export function PaperTradingView() {
   return (
     <div className="space-y-3">
+      <PaperDeskWidgets />
       <CompactExecutionPanel />
       <PaperPortfolio />
       <RiskConsole />

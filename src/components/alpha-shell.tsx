@@ -1,9 +1,9 @@
 import {
   Activity,
-  Bell,
   Bot,
   ChartCandlestick,
   ClipboardList,
+  Command,
   HeartPulse,
   LayoutDashboard,
   Lightbulb,
@@ -42,46 +42,59 @@ const navIcons: Record<NavItem["icon"], LucideIcon> = {
   watchlist: Radar,
 };
 
-function Navigation({ activePath, mobile = false }: { activePath: string; mobile?: boolean }) {
-  return (
-    <nav
-      aria-label={mobile ? "Mobile navigation" : "Primary navigation"}
-      className={mobile ? "flex max-w-full gap-1 overflow-x-auto px-3 py-2" : "space-y-0.5"}
-    >
-      {navItems.map((item) => {
-        const active = item.href === activePath;
-        const Icon = navIcons[item.icon];
+// Group the flat nav into terminal sections for clearer information scent.
+const navGroups: { label: string; hrefs: string[] }[] = [
+  { label: "Command", hrefs: ["/", "/dashboard"] },
+  { label: "Intelligence", hrefs: ["/watchlist", "/agents", "/trade-ideas"] },
+  { label: "Execution", hrefs: ["/risk", "/paper-trading"] },
+  { label: "Records", hrefs: ["/journal", "/reports"] },
+  { label: "Operations", hrefs: ["/settings", "/system-health", "/cost-control"] },
+];
 
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            className={`group flex shrink-0 items-center gap-2.5 rounded px-2.5 py-2 text-xs font-medium transition ${
-              active
-                ? "bg-white/[0.07] text-white"
-                : "text-zinc-500 hover:bg-white/[0.035] hover:text-zinc-200"
-            } ${mobile ? "border border-white/[0.06]" : ""}`}
-          >
-            <Icon
-              aria-hidden
-              className={active ? "size-4 text-emerald-400" : "size-4 text-zinc-600 group-hover:text-zinc-400"}
-              strokeWidth={1.7}
-            />
-            <span>{item.label}</span>
-          </Link>
-        );
-      })}
+function NavLink({
+  item,
+  active,
+  mobile = false,
+}: {
+  item: NavItem;
+  active: boolean;
+  mobile?: boolean;
+}) {
+  const Icon = navIcons[item.icon];
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={`group relative flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-medium transition-all duration-150 ${
+        active
+          ? "bg-white/[0.055] text-white"
+          : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-200"
+      } ${mobile ? "border border-white/[0.06]" : ""}`}
+    >
+      {active && !mobile ? (
+        <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[--ad-accent] shadow-[0_0_10px_var(--ad-accent)]" />
+      ) : null}
+      <Icon
+        aria-hidden
+        className={active ? "size-4 text-[--ad-accent]" : "size-4 text-zinc-600 group-hover:text-zinc-400"}
+        strokeWidth={1.7}
+      />
+      <span className="truncate">{item.label}</span>
+    </Link>
+  );
+}
+
+function MobileNav({ activePath }: { activePath: string }) {
+  return (
+    <nav aria-label="Mobile navigation" className="flex max-w-full gap-1.5 overflow-x-auto px-3 py-2">
+      {navItems.map((item) => (
+        <NavLink key={item.href} item={item} active={item.href === activePath} mobile />
+      ))}
     </nav>
   );
 }
 
-export function AlphaShell({
-  activePath,
-  title,
-  subtitle,
-  children,
-}: AlphaShellProps) {
+export function AlphaShell({ activePath, title, subtitle, children }: AlphaShellProps) {
   const config = getAlphaConfig();
   const exchangeStatus = getMexcAdapterStatus();
   const openAiReady = Boolean(process.env.OPENAI_API_KEY?.trim());
@@ -93,44 +106,62 @@ export function AlphaShell({
         : "Development";
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#080a0c] text-zinc-100">
+    <div className="min-h-screen w-full overflow-x-hidden text-zinc-100">
       <a className="ad-skip-link" href="#main-content">
         Skip to main content
       </a>
       <div className="flex min-h-screen min-w-0">
-        <aside className="sticky top-0 hidden h-screen w-56 shrink-0 border-r border-white/[0.07] bg-[#090c0f] lg:flex lg:flex-col">
-          <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-white/[0.07] px-4">
-            <span className="grid size-8 place-items-center rounded border border-emerald-400/25 bg-emerald-400/[0.08] font-mono text-xs font-black text-emerald-300">
-              H
+        {/* ---------------------------------- Sidebar -------------------- */}
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-white/[0.06] bg-[--ad-canvas-2]/80 backdrop-blur-xl lg:flex">
+          <Link
+            href="/dashboard"
+            className="flex h-16 items-center gap-3 border-b border-white/[0.06] px-4"
+          >
+            <span className="ad-glow grid size-9 place-items-center rounded-xl border border-[--ad-accent]/30 bg-[--ad-accent]/[0.07] font-mono text-sm font-black text-[--ad-accent]">
+              A
             </span>
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-semibold text-zinc-100">Hypermind</span>
-              <span className="block truncate text-[11px] text-zinc-600">AlphaDesk</span>
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-sm font-semibold tracking-tight text-zinc-50">
+                AlphaDesk
+              </span>
+              <span className="ad-eyebrow block truncate">Hypermind Terminal</span>
             </span>
           </Link>
 
-          <div className="flex-1 overflow-y-auto px-3 py-4">
-            <p className="mb-2 px-2.5 text-[9px] font-semibold uppercase text-zinc-700">Workspace</p>
-            <Navigation activePath={activePath} />
+          <div className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+            {navGroups.map((group) => {
+              const items = navItems.filter((n) => group.hrefs.includes(n.href));
+              if (!items.length) return null;
+              return (
+                <div key={group.label}>
+                  <p className="ad-eyebrow mb-1.5 px-2.5">{group.label}</p>
+                  <div className="space-y-0.5">
+                    {items.map((item) => (
+                      <NavLink key={item.href} item={item} active={item.href === activePath} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="border-t border-white/[0.07] p-3">
-            <div className="rounded border border-white/[0.07] bg-white/[0.02] p-3">
+          <div className="border-t border-white/[0.06] p-3">
+            <div className="ad-card overflow-hidden p-3">
               <div className="flex items-center justify-between text-[10px]">
-                <span className="text-zinc-600">Operating mode</span>
-                <span className="font-mono text-emerald-400">PAPER</span>
-              </div>
-              <div className="mt-2 flex items-center justify-between text-[10px]">
-                <span className="text-zinc-600">System</span>
-                <span className="flex items-center gap-1.5 text-zinc-400">
-                  <span className="size-1.5 rounded-full bg-emerald-400" />
-                  Operational
+                <span className="ad-eyebrow">Operating mode</span>
+                <span className="flex items-center gap-1.5 font-mono font-semibold text-[--ad-accent]">
+                  <span className="ad-dot bg-[--ad-accent] text-[--ad-accent]" />
+                  PAPER
                 </span>
+              </div>
+              <div className="mt-2.5 flex items-center justify-between text-[10px]">
+                <span className="ad-eyebrow">Live guard</span>
+                <span className="font-mono font-semibold text-zinc-300">LOCKED</span>
               </div>
             </div>
             <form action="/api/auth/logout" method="post" className="mt-2">
               <button
-                className="flex w-full items-center justify-center gap-2 rounded border border-white/[0.08] px-3 py-2 text-xs text-zinc-500 transition hover:border-white/15 hover:text-zinc-200"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.07] px-3 py-2 text-xs text-zinc-500 transition hover:border-white/15 hover:text-zinc-200"
                 type="submit"
               >
                 <LockKeyhole aria-hidden className="size-3.5" strokeWidth={1.7} />
@@ -140,51 +171,50 @@ export function AlphaShell({
           </div>
         </aside>
 
+        {/* ---------------------------------- Main ----------------------- */}
         <main className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#080a0c]/95 backdrop-blur">
-            <div className="flex min-w-0 flex-col items-stretch gap-2 px-4 py-2 sm:min-h-16 sm:flex-row sm:items-center sm:justify-between sm:py-0 sm:px-5 xl:px-6">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="shrink-0 text-base font-semibold text-white">{title}</h1>
-                  <span className="hidden text-zinc-800 2xl:inline">/</span>
-                  <span className="hidden truncate text-xs text-zinc-600 2xl:inline">{subtitle}</span>
-                </div>
+          <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[--ad-canvas]/85 backdrop-blur-xl">
+            <div className="flex min-w-0 flex-col items-stretch gap-2 px-4 py-2.5 sm:min-h-16 sm:flex-row sm:items-center sm:justify-between sm:py-0 sm:px-5 xl:px-6">
+              <div className="flex min-w-0 items-center gap-3">
+                <h1 className="shrink-0 text-[15px] font-semibold tracking-tight text-white">
+                  {title}
+                </h1>
+                <span className="hidden h-3.5 w-px bg-white/10 2xl:block" />
+                <span className="hidden max-w-md truncate text-xs text-zinc-500 2xl:block">
+                  {subtitle}
+                </span>
               </div>
 
               <div className="flex min-w-0 max-w-full shrink-0 items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                <span className="hidden items-center gap-1.5 rounded-md border border-white/[0.07] px-2 py-1 text-[10px] text-zinc-500 md:inline-flex">
+                  <Command aria-hidden className="size-3" />
+                  <span className="font-mono">⌘K</span>
+                </span>
                 <StateBadge tone={config.paperTradingEnabled ? "positive" : "danger"}>
-                  {`Paper trading ${config.paperTradingEnabled ? "ON" : "OFF"}`}
+                  {`Paper ${config.paperTradingEnabled ? "ON" : "OFF"}`}
                 </StateBadge>
                 <StateBadge tone={config.liveTradingEnabled ? "danger" : "neutral"}>
-                  {`Live trading ${config.liveTradingEnabled ? "ON" : "OFF"}`}
+                  {`Live ${config.liveTradingEnabled ? "ON" : "OFF"}`}
                 </StateBadge>
                 <StateBadge tone={exchangeStatus.credentialsReady ? "positive" : "warning"}>
-                  MEXC {exchangeStatus.credentialsReady ? "connected" : "disconnected"}
+                  MEXC {exchangeStatus.credentialsReady ? "connected" : "offline"}
                 </StateBadge>
-                <StateBadge tone={openAiReady ? "positive" : "warning"}>
+                <StateBadge tone={openAiReady ? "info" : "warning"}>
                   AI {openAiReady ? config.openAiModel : "fallback"}
                 </StateBadge>
                 <StateBadge tone={environment === "Production" ? "info" : "neutral"}>
                   {environment}
                 </StateBadge>
-                <button
-                  aria-label="Notifications"
-                  className="ml-1 grid size-8 place-items-center rounded border border-white/[0.07] text-zinc-600 transition hover:text-zinc-200"
-                  title="Notifications"
-                  type="button"
-                >
-                  <Bell aria-hidden className="size-4" strokeWidth={1.7} />
-                </button>
               </div>
             </div>
 
             <div className="border-t border-white/[0.05] lg:hidden">
-              <Navigation activePath={activePath} mobile />
+              <MobileNav activePath={activePath} />
             </div>
           </header>
 
           <div
-            className="w-full min-w-0 px-3 py-3 sm:px-4 xl:px-5 xl:py-4"
+            className="ad-fade-in w-full min-w-0 px-3 py-3 sm:px-4 xl:px-6 xl:py-5"
             id="main-content"
             tabIndex={-1}
           >

@@ -7,6 +7,7 @@ import { MarketTable } from "../market-table";
 import { StatusChip } from "../status-chip";
 import { EmptyState } from "../trading-ui";
 import { Panel } from "./primitives";
+import { MarketIntelligenceWidgets } from "./widgets";
 
 // Market Scanner view. Self-contained: it only needs the server-provided market
 // snapshot. Demonstrates the per-view decomposition pattern for the rest of the
@@ -15,7 +16,9 @@ export function WatchlistView({ marketData }: { marketData: MarketDataResult }) 
   const hasAssets = marketData.assets.length > 0;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
+      <MarketIntelligenceWidgets />
+
       <MarketTable marketData={marketData} />
 
       <Panel

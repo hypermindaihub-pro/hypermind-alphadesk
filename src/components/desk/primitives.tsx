@@ -20,10 +20,10 @@ export function Panel({
   action?: ReactNode;
 }) {
   return (
-    <section className="min-w-0 overflow-hidden rounded-md border border-white/[0.08] bg-[#0d1115]">
-      <div className="flex min-w-0 flex-col gap-3 border-b border-white/[0.07] px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="ad-panel ad-fade-up min-w-0 overflow-hidden">
+      <div className="flex min-w-0 flex-col gap-3 border-b border-white/[0.06] px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-[13px] font-semibold text-white">{title}</h2>
+          <h2 className="text-[13px] font-semibold tracking-tight text-zinc-100">{title}</h2>
           {description ? (
             <p className="mt-1 break-words text-xs leading-5 text-zinc-500">
               {description}
@@ -52,14 +52,14 @@ export function Button({
 }) {
   const className = {
     primary:
-      "border-emerald-400/30 bg-emerald-400/[0.09] text-emerald-200 hover:bg-emerald-400/[0.15]",
-    secondary: "border-white/[0.09] bg-white/[0.025] text-zinc-300 hover:bg-white/[0.06]",
-    danger: "border-red-400/30 bg-red-400/[0.08] text-red-200 hover:bg-red-400/[0.14]",
+      "border-[--ad-accent]/30 bg-[--ad-accent]/[0.1] text-[--ad-accent] hover:bg-[--ad-accent]/[0.18] hover:shadow-[0_0_18px_-8px_var(--ad-accent)]",
+    secondary: "border-white/[0.09] bg-white/[0.025] text-zinc-300 hover:bg-white/[0.06] hover:border-white/15",
+    danger: "border-rose-400/30 bg-rose-400/[0.08] text-rose-200 hover:bg-rose-400/[0.16]",
   }[variant];
 
   return (
     <button
-      className={`inline-flex min-h-8 items-center justify-center rounded border px-3 py-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex min-h-8 items-center justify-center rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       disabled={disabled}
       onClick={onClick}
       type={type}
@@ -86,7 +86,7 @@ export function TextInput({
         {label}
       </span>
       <input
-        className="mt-1.5 h-9 w-full rounded border border-white/[0.09] bg-[#090c0f] px-3 text-xs text-white outline-none transition placeholder:text-zinc-700 focus:border-emerald-400/40"
+        className="mt-1.5 h-9 w-full rounded-lg border border-white/[0.09] bg-[--ad-inset] px-3 text-xs text-white outline-none transition placeholder:text-zinc-700 focus:border-[--ad-accent]/40 focus:ring-2 focus:ring-[--ad-accent]/10"
         onChange={(event) => onChange(event.target.value)}
         type={type}
         value={value}
@@ -124,10 +124,10 @@ export function AgentStatusCard({
   synthetic?: boolean;
 }) {
   return (
-    <article className="min-w-0 rounded-md border border-white/[0.08] bg-[#090c0f] p-4">
+    <article className="ad-card ad-card-hover min-w-0 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid size-9 shrink-0 place-items-center rounded border border-white/[0.08] bg-white/[0.025]">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.025]">
             <Icon aria-hidden className="size-4 text-zinc-400" strokeWidth={1.6} />
           </span>
           <div className="min-w-0">

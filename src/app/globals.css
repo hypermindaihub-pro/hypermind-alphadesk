@@ -1,22 +1,64 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   AlphaDesk Terminal — institutional design system
+   A premium, information-dense visual language for a 2026 AI trading terminal.
+   Foundations only: colours, type, elevation, motion, and reusable utilities.
+   ========================================================================== */
+
 :root {
-  --background: #080a0c;
-  --foreground: #f4f4f5;
+  /* Canvas + surfaces (layered near-black) */
+  --ad-canvas: #06070a;
+  --ad-canvas-2: #08090d;
+  --ad-surface: #0b0d12;
+  --ad-surface-2: #0f1219;
+  --ad-surface-3: #141823;
+  --ad-inset: #070809;
+
+  /* Hairlines */
+  --ad-line: rgba(255, 255, 255, 0.07);
+  --ad-line-strong: rgba(255, 255, 255, 0.12);
+  --ad-line-faint: rgba(255, 255, 255, 0.045);
+
+  /* Text */
+  --ad-text: #e9ecf1;
+  --ad-text-2: #aab2bd;
+  --ad-text-3: #6b7280;
+  --ad-text-4: #454b55;
+
+  /* Brand + semantic accents */
+  --ad-accent: #2ee6c6;          /* signature mint-cyan */
+  --ad-accent-2: #38bdf8;        /* data / AI cyan */
+  --ad-pos: #34d399;             /* long / gain */
+  --ad-neg: #fb7185;             /* short / loss */
+  --ad-warn: #fbbf24;            /* caution */
+  --ad-info: #60a5fa;
+
+  --background: var(--ad-canvas);
+  --foreground: var(--ad-text);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Cascadia Code", Consolas, monospace;
-}
+  --color-background: var(--ad-canvas);
+  --color-foreground: var(--ad-text);
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  letter-spacing: 0;
+  --color-canvas: var(--ad-canvas);
+  --color-surface: var(--ad-surface);
+  --color-surface-2: var(--ad-surface-2);
+  --color-surface-3: var(--ad-surface-3);
+  --color-line: var(--ad-line);
+  --color-ad-text: var(--ad-text);
+  --color-ad-muted: var(--ad-text-3);
+  --color-accent: var(--ad-accent);
+  --color-accent-2: var(--ad-accent-2);
+  --color-pos: var(--ad-pos);
+  --color-neg: var(--ad-neg);
+  --color-warn: var(--ad-warn);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  --radius-card: 12px;
 }
 
 html,
@@ -25,14 +67,33 @@ body {
   overflow-x: hidden;
 }
 
-::selection {
-  background: rgba(52, 211, 153, 0.24);
-  color: #ffffff;
+body {
+  background: var(--ad-canvas);
+  color: var(--ad-text);
+  font-family: var(--font-sans);
+  letter-spacing: -0.011em;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Terminal canvas: faint dot-grid + soft corner glows */
+  background-image:
+    radial-gradient(900px 520px at 88% -8%, rgba(46, 230, 198, 0.05), transparent 60%),
+    radial-gradient(820px 480px at -6% 4%, rgba(56, 189, 248, 0.045), transparent 58%),
+    radial-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: auto, auto, 26px 26px;
+  background-attachment: fixed;
 }
 
-* {
-  scrollbar-color: #27272a #090c0f;
-  scrollbar-width: thin;
+/* Numerals: always tabular + lined up in data contexts */
+.font-mono,
+[class*="tabular"],
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--ad-accent) 28%, transparent);
+  color: #ffffff;
 }
 
 button,
@@ -42,7 +103,111 @@ textarea {
   font: inherit;
 }
 
-/* Visually hidden, but available to assistive tech and on focus. */
+/* Premium thin scrollbars */
+* {
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  scrollbar-width: thin;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Consistent, visible focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ad-accent) 70%, transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ----------------------------- Surfaces ---------------------------------- */
+
+.ad-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0) 40%),
+    var(--ad-surface);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--radius-card);
+}
+
+/* Hairline top-highlight that reads as a premium glass edge */
+.ad-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.16),
+    transparent
+  );
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  pointer-events: none;
+}
+
+.ad-card {
+  background: var(--ad-surface-2);
+  border: 1px solid var(--ad-line);
+  border-radius: 10px;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+.ad-card-hover:hover {
+  border-color: var(--ad-line-strong);
+  background: var(--ad-surface-3);
+}
+
+.ad-hairline {
+  border-color: var(--ad-line);
+}
+
+/* Accent glow used sparingly on the active / hero element */
+.ad-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--ad-accent) 22%, transparent),
+    0 0 32px -10px color-mix(in oklab, var(--ad-accent) 45%, transparent);
+}
+
+/* Subtle scanline texture for terminal panels */
+.ad-scan {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.014) 0,
+    rgba(255, 255, 255, 0.014) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Section eyebrow label */
+.ad-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ad-text-3);
+}
+
+/* Live status dot with a soft halo (static — screenshot/perf safe) */
+.ad-dot {
+  position: relative;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px color-mix(in oklab, currentColor 18%, transparent);
+}
+
+/* ----------------------------- Utilities --------------------------------- */
+
 .ad-sr-only {
   position: absolute;
   width: 1px;
@@ -55,48 +220,89 @@ textarea {
   border: 0;
 }
 
-/* Skip-to-content link: hidden until focused, then anchored top-left. */
 .ad-skip-link {
   position: absolute;
   left: 0.75rem;
   top: -3rem;
   z-index: 60;
-  border-radius: 0.375rem;
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  background: #0d1115;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, var(--ad-accent) 45%, transparent);
+  background: var(--ad-surface-2);
   padding: 0.5rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6ee7b7;
+  color: var(--ad-accent);
   transition: top 0.15s ease;
 }
-
 .ad-skip-link:focus {
   top: 0.75rem;
   outline: none;
 }
 
-/* Loading skeleton shimmer. */
+/* ----------------------------- Motion ------------------------------------ */
+
+.ad-fade-up {
+  animation: ad-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ad-fade-in {
+  animation: ad-fade-in 0.4s ease both;
+}
+
+/* Staggered children entrance for grids/lists */
+.ad-stagger > * {
+  animation: ad-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ad-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.ad-stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.ad-stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.ad-stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.ad-stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.ad-stagger > *:nth-child(6) { animation-delay: 0.22s; }
+
 .ad-skeleton {
-  animation: ad-skeleton-pulse 1.4s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+.ad-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  animation: ad-sheen 1.5s ease-in-out infinite;
 }
 
-@keyframes ad-skeleton-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
+@keyframes ad-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ad-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ad-sheen {
+  100% { transform: translateX(100%); }
+}
+@keyframes ad-ping {
+  0% { transform: scale(0.6); opacity: 0.7; }
+  80%, 100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Respect users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-  .ad-skeleton {
-    animation: none;
+  *,
+  .ad-fade-up,
+  .ad-fade-in,
+  .ad-stagger > *,
+  .ad-skeleton::after,
+  .ad-dot::after {
+    animation: none !important;
   }
-
   * {
     scroll-behavior: auto !important;
   }
