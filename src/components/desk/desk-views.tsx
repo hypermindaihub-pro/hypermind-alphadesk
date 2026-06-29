@@ -2346,19 +2346,18 @@ export function DashboardView() {
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span
-                  className={`inline-flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs font-semibold tabular-nums ${
-                    dailyPnl >= 0
-                      ? "bg-emerald-400/10 text-emerald-300"
-                      : "bg-rose-400/10 text-rose-300"
+                  className={`ad-num inline-flex items-center gap-1.5 text-sm font-semibold ${
+                    dailyPnl >= 0 ? "text-emerald-400" : "text-rose-400"
                   }`}
                 >
-                  {dailyPnl >= 0 ? "▲" : "▼"} {formatUsd(Math.abs(dailyPnl), 2)}
-                  <span className="opacity-70">
+                  <span className="text-[10px]">{dailyPnl >= 0 ? "▲" : "▼"}</span>
+                  {formatUsd(Math.abs(dailyPnl), 2)}
+                  <span className="text-zinc-500">
                     ({dailyPct >= 0 ? "+" : ""}
                     {dailyPct.toFixed(2)}%)
                   </span>
                 </span>
-                <span className="text-[11px] text-zinc-500">today · paper</span>
+                <span className="text-[11px] text-zinc-600">today · paper</span>
                 <StateBadge tone={regime.tone}>{regime.label} regime</StateBadge>
               </div>
             </div>
@@ -2388,7 +2387,7 @@ export function DashboardView() {
           </div>
         </div>
 
-        <div className="ad-panel ad-fade-up flex min-w-0 flex-col gap-4 p-5">
+        <div className="ad-panel ad-fade-up flex min-w-0 flex-col gap-4 p-6">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="ad-eyebrow">Risk score</p>

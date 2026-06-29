@@ -52,7 +52,7 @@ export function Button({
 }) {
   const className = {
     primary:
-      "border-[--ad-accent]/30 bg-[--ad-accent]/[0.1] text-[--ad-accent] hover:bg-[--ad-accent]/[0.18] hover:shadow-[0_0_18px_-8px_var(--ad-accent)]",
+      "border-[--ad-accent]/25 bg-[--ad-accent]/[0.08] text-[--ad-accent] hover:bg-[--ad-accent]/[0.14]",
     secondary: "border-white/[0.09] bg-white/[0.025] text-zinc-300 hover:bg-white/[0.06] hover:border-white/15",
     danger: "border-rose-400/30 bg-rose-400/[0.08] text-rose-200 hover:bg-rose-400/[0.16]",
   }[variant];

@@ -72,12 +72,12 @@ function NavLink({
       } ${mobile ? "border border-white/[0.06]" : ""}`}
     >
       {active && !mobile ? (
-        <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[--ad-accent] shadow-[0_0_10px_var(--ad-accent)]" />
+        <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[--ad-accent]" />
       ) : null}
       <Icon
         aria-hidden
         className={active ? "size-4 text-[--ad-accent]" : "size-4 text-zinc-600 group-hover:text-zinc-400"}
-        strokeWidth={1.7}
+        strokeWidth={1.6}
       />
       <span className="truncate">{item.label}</span>
     </Link>
@@ -220,6 +220,30 @@ export function AlphaShell({ activePath, title, subtitle, children }: AlphaShell
           >
             {children}
           </div>
+
+          <footer className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-white/[0.05] px-4 py-2.5 text-[11px] text-zinc-600 sm:px-5 xl:px-6">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
+              <span className="flex items-center gap-1.5">
+                <span className="ad-dot bg-[--ad-accent] text-[--ad-accent]" />
+                Paper desk · {environment}
+              </span>
+              <span>
+                MEXC{" "}
+                <span className={exchangeStatus.credentialsReady ? "text-emerald-400/80" : "text-amber-400/80"}>
+                  {exchangeStatus.credentialsReady ? "connected" : "offline"}
+                </span>
+              </span>
+              <span className="hidden sm:inline">
+                AI <span className="text-zinc-400">{openAiReady ? config.openAiModel : "deterministic fallback"}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-x-6">
+              <span>
+                Live execution <span className="text-zinc-400">locked</span>
+              </span>
+              <span className="hidden font-mono text-zinc-700 md:inline">Hypermind AlphaDesk</span>
+            </div>
+          </footer>
         </main>
       </div>
     </div>
