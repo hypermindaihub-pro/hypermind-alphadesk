@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 type Tone = "positive" | "warning" | "danger" | "neutral" | "info";
 
 const toneStyles: Record<Tone, string> = {
-  positive: "border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300",
-  warning: "border-amber-400/20 bg-amber-400/[0.07] text-amber-300",
-  danger: "border-rose-400/20 bg-rose-400/[0.07] text-rose-300",
-  neutral: "border-white/10 bg-white/[0.03] text-zinc-300",
-  info: "border-sky-400/20 bg-sky-400/[0.07] text-sky-300",
+  positive: "border-emerald-400/15 bg-emerald-400/[0.05] text-emerald-300/90",
+  warning: "border-amber-400/15 bg-amber-400/[0.05] text-amber-300/90",
+  danger: "border-rose-400/15 bg-rose-400/[0.05] text-rose-300/90",
+  neutral: "border-white/[0.08] bg-white/[0.025] text-zinc-400",
+  info: "border-sky-400/15 bg-sky-400/[0.05] text-sky-300/90",
 };
 
 const toneDot: Record<Tone, string> = {
@@ -36,14 +36,14 @@ export function TerminalPanel({
 }) {
   return (
     <section className={`ad-panel ad-fade-up min-w-0 overflow-hidden ${className}`}>
-      <header className="flex min-h-12 min-w-0 flex-col gap-3 border-b border-white/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex min-w-0 flex-col gap-3 border-b border-white/[0.06] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="ad-eyebrow mb-1">{eyebrow ?? "Workspace"}</p>
-          <h2 className="truncate text-[13px] font-semibold tracking-tight text-zinc-100">
+          <p className="ad-eyebrow mb-1.5">{eyebrow ?? "Workspace"}</p>
+          <h2 className="truncate text-[13.5px] font-semibold tracking-tight text-zinc-50">
             {title}
           </h2>
           {description ? (
-            <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{description}</p>
+            <p className="mt-1.5 max-w-3xl text-xs leading-relaxed text-zinc-500">{description}</p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
@@ -77,18 +77,18 @@ export function MetricCell({
   }[tone];
 
   return (
-    <div className="group relative min-w-0 border-b border-r border-white/[0.06] bg-transparent px-4 py-4 transition-colors even:border-r-0 last:border-b-0 hover:bg-white/[0.015] sm:px-5 xl:border-b-0 xl:even:border-r xl:last:border-r-0">
+    <div className="group relative min-w-0 border-b border-r border-white/[0.06] bg-transparent px-5 py-4 transition-colors duration-200 even:border-r-0 last:border-b-0 hover:bg-white/[0.012] sm:py-5 xl:border-b-0 xl:even:border-r xl:last:border-r-0">
       <div className="flex items-center justify-between gap-2">
         <span className="ad-eyebrow flex items-center gap-1.5">
-          {Icon ? <Icon aria-hidden className="size-3.5 text-zinc-600" strokeWidth={1.7} /> : null}
+          {Icon ? <Icon aria-hidden className="size-3.5 text-zinc-600" strokeWidth={1.6} /> : null}
           <span className="truncate">{label}</span>
         </span>
-        {spark ? <Sparkline data={spark} tone={tone} className="h-5 w-16 opacity-80" /> : null}
+        {spark ? <Sparkline data={spark} tone={tone} className="h-5 w-16 opacity-70" /> : null}
       </div>
-      <p className={`mt-2.5 truncate font-mono text-[22px] font-semibold leading-none tracking-tight tabular-nums ${valueColor}`}>
+      <p className={`ad-num mt-3 truncate text-[21px] font-semibold leading-none ${valueColor}`}>
         {value}
       </p>
-      {detail ? <p className="mt-1.5 truncate text-[11px] text-zinc-500">{detail}</p> : null}
+      {detail ? <p className="mt-2 truncate text-[11px] leading-4 text-zinc-500">{detail}</p> : null}
     </div>
   );
 }
@@ -120,16 +120,16 @@ export function ProgressMeter({
   tone?: Exclude<Tone, "neutral" | "info">;
 }) {
   const fill = {
-    positive: "from-emerald-500/80 to-emerald-300",
-    warning: "from-amber-500/80 to-amber-300",
-    danger: "from-rose-500/80 to-rose-300",
+    positive: "bg-emerald-400/85",
+    warning: "bg-amber-400/85",
+    danger: "bg-rose-400/85",
   }[tone];
   const bounded = Math.min(100, Math.max(0, value));
 
   return (
-    <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+    <div className="h-1 overflow-hidden rounded-full bg-white/[0.06]">
       <div
-        className={`h-full rounded-full bg-gradient-to-r ${fill} transition-[width] duration-500 ease-out`}
+        className={`h-full rounded-full ${fill} transition-[width] duration-700 ease-out`}
         style={{ width: `${bounded}%` }}
       />
     </div>
@@ -232,7 +232,7 @@ export function Sparkline({
   tone = "neutral",
   className = "",
   fill = false,
-  strokeWidth = 1.5,
+  strokeWidth = 1.4,
 }: {
   data: number[];
   tone?: Tone;
@@ -270,7 +270,7 @@ export function Sparkline({
         <>
           <defs>
             <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+              <stop offset="0%" stopColor={color} stopOpacity="0.16" />
               <stop offset="100%" stopColor={color} stopOpacity="0" />
             </linearGradient>
           </defs>

@@ -2337,11 +2337,11 @@ export function DashboardView() {
     <div className="space-y-3">
       {/* ----------------------------- Hero --------------------------- */}
       <section className="grid gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <div className="ad-panel ad-scan ad-fade-up relative min-w-0 overflow-hidden p-5">
+        <div className="ad-panel ad-fade-up relative min-w-0 overflow-hidden p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="ad-eyebrow">Paper portfolio value</p>
-              <p className="mt-2 font-mono text-[34px] font-semibold leading-none tracking-tight tabular-nums text-zinc-50">
+              <p className="ad-num mt-2.5 text-[36px] font-semibold leading-none text-zinc-50">
                 {formatUsd(paperEquity, 2)}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">

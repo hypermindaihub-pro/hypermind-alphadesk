@@ -55,8 +55,8 @@
   --color-neg: var(--ad-neg);
   --color-warn: var(--ad-warn);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", "Cascadia Code", "SF Mono", Consolas, monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), "SF Mono", "Cascadia Code", Consolas, monospace;
 
   --radius-card: 12px;
 }
@@ -71,17 +71,32 @@ body {
   background: var(--ad-canvas);
   color: var(--ad-text);
   font-family: var(--font-sans);
-  letter-spacing: -0.011em;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.006em;
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Terminal canvas: faint dot-grid + soft corner glows */
+  /* Terminal canvas: very faint dot-grid + restrained corner light. */
   background-image:
-    radial-gradient(900px 520px at 88% -8%, rgba(46, 230, 198, 0.05), transparent 60%),
-    radial-gradient(820px 480px at -6% 4%, rgba(56, 189, 248, 0.045), transparent 58%),
-    radial-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: auto, auto, 26px 26px;
+    radial-gradient(1000px 560px at 92% -10%, rgba(46, 230, 198, 0.028), transparent 62%),
+    radial-gradient(900px 520px at -8% 2%, rgba(56, 189, 248, 0.022), transparent 60%),
+    radial-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px;
   background-attachment: fixed;
+}
+
+/* Heading rhythm: tight tracking, confident weight, calm sizes. */
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+}
+
+/* Financial figures: tabular, slightly tightened, never wobble. */
+.ad-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 /* Numerals: always tabular + lined up in data contexts */
@@ -131,14 +146,15 @@ textarea {
 
 .ad-panel {
   position: relative;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0) 40%),
-    var(--ad-surface);
+  background: var(--ad-surface);
   border: 1px solid var(--ad-line);
   border-radius: var(--radius-card);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.02),
+    0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-/* Hairline top-highlight that reads as a premium glass edge */
+/* Hairline top-highlight — a restrained glass edge, not a shine. */
 .ad-panel::before {
   content: "";
   position: absolute;
@@ -147,7 +163,7 @@ textarea {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.09),
     transparent
   );
   border-radius: var(--radius-card) var(--radius-card) 0 0;
@@ -169,22 +185,11 @@ textarea {
   border-color: var(--ad-line);
 }
 
-/* Accent glow used sparingly on the active / hero element */
+/* Accent ring used sparingly on the brand / hero element — calm, not neon. */
 .ad-glow {
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--ad-accent) 22%, transparent),
-    0 0 32px -10px color-mix(in oklab, var(--ad-accent) 45%, transparent);
-}
-
-/* Subtle scanline texture for terminal panels */
-.ad-scan {
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.014) 0,
-    rgba(255, 255, 255, 0.014) 1px,
-    transparent 1px,
-    transparent 3px
-  );
+    0 0 0 1px color-mix(in oklab, var(--ad-accent) 14%, transparent),
+    0 0 18px -14px color-mix(in oklab, var(--ad-accent) 34%, transparent);
 }
 
 /* Section eyebrow label */
@@ -242,22 +247,22 @@ textarea {
 /* ----------------------------- Motion ------------------------------------ */
 
 .ad-fade-up {
-  animation: ad-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: ad-fade-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .ad-fade-in {
-  animation: ad-fade-in 0.4s ease both;
+  animation: ad-fade-in 0.34s ease both;
 }
 
-/* Staggered children entrance for grids/lists */
+/* Staggered children entrance for grids/lists — gentle, tight cadence. */
 .ad-stagger > * {
-  animation: ad-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: ad-fade-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .ad-stagger > *:nth-child(1) { animation-delay: 0.02s; }
-.ad-stagger > *:nth-child(2) { animation-delay: 0.06s; }
-.ad-stagger > *:nth-child(3) { animation-delay: 0.1s; }
-.ad-stagger > *:nth-child(4) { animation-delay: 0.14s; }
-.ad-stagger > *:nth-child(5) { animation-delay: 0.18s; }
-.ad-stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.ad-stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.ad-stagger > *:nth-child(3) { animation-delay: 0.08s; }
+.ad-stagger > *:nth-child(4) { animation-delay: 0.11s; }
+.ad-stagger > *:nth-child(5) { animation-delay: 0.14s; }
+.ad-stagger > *:nth-child(6) { animation-delay: 0.17s; }
 
 .ad-skeleton {
   position: relative;
@@ -279,7 +284,7 @@ textarea {
 }
 
 @keyframes ad-fade-up {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes ad-fade-in {

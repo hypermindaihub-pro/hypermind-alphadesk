@@ -40,14 +40,14 @@ function changeTone(change: number) {
 function HBar({ value, max, tone = "positive" }: { value: number; max: number; tone?: "positive" | "danger" | "warning" | "info" }) {
   const pct = Math.max(2, Math.min(100, (value / Math.max(max, 0.0001)) * 100));
   const c = {
-    positive: "from-emerald-500/70 to-emerald-300",
-    danger: "from-rose-500/70 to-rose-300",
-    warning: "from-amber-500/70 to-amber-300",
-    info: "from-sky-500/70 to-sky-300",
+    positive: "bg-emerald-400/80",
+    danger: "bg-rose-400/80",
+    warning: "bg-amber-400/80",
+    info: "bg-sky-400/80",
   }[tone];
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
-      <div className={`h-full rounded-full bg-gradient-to-r ${c}`} style={{ width: `${pct}%` }} />
+    <div className="h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+      <div className={`h-full rounded-full ${c} transition-[width] duration-700 ease-out`} style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -119,18 +119,18 @@ export function MarketIntelligenceWidgets() {
           description="Simulated coverage universe, sized by weight and shaded by 24h move. Live CoinGecko prices appear in the scanner below."
           action={<StateBadge tone={regime.tone}>{regime.label}</StateBadge>}
         >
-          <div className="grid grid-cols-3 gap-1.5 p-3 sm:grid-cols-4">
+          <div className="grid grid-cols-3 gap-2 p-4 sm:grid-cols-4">
             {uni.map((a) => {
-              const intensity = Math.min(0.32, Math.abs(a.change) / 28);
-              const bg = a.change >= 0 ? `rgba(52,211,153,${0.06 + intensity})` : `rgba(251,113,133,${0.06 + intensity})`;
+              const intensity = Math.min(0.16, Math.abs(a.change) / 46);
+              const bg = a.change >= 0 ? `rgba(52,211,153,${0.035 + intensity})` : `rgba(251,113,133,${0.035 + intensity})`;
               return (
                 <div
                   key={a.symbol}
-                  className="rounded-lg border border-white/[0.06] p-2.5 transition hover:border-white/15"
+                  className="rounded-lg border border-white/[0.05] p-3 transition-colors duration-200 hover:border-white/[0.12]"
                   style={{ background: bg }}
                 >
-                  <p className="font-mono text-xs font-semibold text-zinc-100">{a.symbol}</p>
-                  <p className={`mt-1 font-mono text-[11px] tabular-nums ${a.change >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+                  <p className="ad-num text-xs font-semibold text-zinc-50">{a.symbol}</p>
+                  <p className={`ad-num mt-1.5 text-[11px] ${a.change >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
                     {formatPct(a.change)}
                   </p>
                 </div>
